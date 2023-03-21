@@ -29,7 +29,7 @@ type Options struct {
 	ClientSecret string
 	VaultId      string
 	RouteId      string
-	Environment  Environment
+	Environment  string
 
 	VaultURL      *url.URL
 	PaymentURL    *url.URL
@@ -88,7 +88,7 @@ func NewClientWithContext(ctx context.Context, options *Options) (*Client, error
 		options.HTTPClient = http.DefaultClient
 	}
 	if options.Environment == "" {
-		options.Environment = Sandbox
+		options.Environment = "sandbox"
 	}
 	if options.Authenticator == nil {
 		options.Authenticator = NewOAuthAuthenticator(
