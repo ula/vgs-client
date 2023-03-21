@@ -104,9 +104,14 @@ func NewClientWithContext(ctx context.Context, options *Options) (*Client, error
 }
 
 func (c *Client) NewRequest(request *Request) (*http.Request, error) {
-	fullUrl, err := c.Options.GetPaymentUrl()
+	baseUrl, err := c.Options.GetPaymentUrl()
 	if err != nil {
-		log.Printf("Unable to parse required uri: %s", request.Uri)
+		log.Printf("Unable to parse base url: %s", err)
+		return nil, err
+	}
+	fullUrl, err := baseUrl.Parse(request.Uri)
+	if err != nil {
+		log.Printf("Unable to parse base url: %s", request.Uri)
 		return nil, err
 	}
 	var buf io.Reader
