@@ -29,7 +29,7 @@ type Options struct {
 	ClientSecret string
 	VaultId      string
 	RouteId      string
-	Environment  string
+	Environment  Environment
 
 	VaultURL      *url.URL
 	PaymentURL    *url.URL
@@ -66,8 +66,8 @@ type Client struct {
 	Options *Options
 	Ctx     context.Context
 
-	lastRequest  *http.Request
-	lastResponse *http.Response
+	LastRequest  *http.Request
+	LastResponse *http.Response
 }
 
 func NewClient(options *Options) (*Client, error) {
@@ -88,7 +88,7 @@ func NewClientWithContext(ctx context.Context, options *Options) (*Client, error
 		options.HTTPClient = http.DefaultClient
 	}
 	if options.Environment == "" {
-		options.Environment = "sandbox"
+		options.Environment = Sandbox
 	}
 	if options.Authenticator == nil {
 		options.Authenticator = NewOAuthAuthenticator(
@@ -131,7 +131,7 @@ func (c *Client) NewRequest(request *Request) (*http.Request, error) {
 
 func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 	req = req.WithContext(c.Ctx)
-	c.lastRequest = req
+	c.LastRequest = req
 	resp, err := c.Options.HTTPClient.Do(req)
 	if err != nil {
 		select {
@@ -141,7 +141,7 @@ func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
 		}
 		return nil, err
 	}
-	c.lastResponse = resp
+	c.LastResponse = resp
 
 	response := NewResponse(resp)
 	defer resp.Body.Close()
